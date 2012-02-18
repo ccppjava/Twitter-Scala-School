@@ -141,6 +141,12 @@ object example03 {
 		// <console>:1: error: illegal start of simple expression
 		//        extensions.filter(case (name, extension) => extension < 200)
 
+		// above mistake is from that I should have used curly bracket instead of
+		// the normal bracket, it works as follows:
+		// extensions.filter{case (name, extension) => extension < 200}
+		//
+		// follows is learnt after example04
+		val phoneExt:PartialFunction[(String, Int), Boolean] = {case (name, extension) => extension < 200}
 	}
 }
 
