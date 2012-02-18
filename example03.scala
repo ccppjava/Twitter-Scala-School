@@ -111,6 +111,36 @@ object example03 {
 		// .map(x: List[Int] => x.map(_ * 2)).flatten
 		//
 		// Generalized functional combinators (TODO)
+		// every functional combinator shown above can be written on top of Fold.
+		def ourMap(numbers: List[Int], fn: Int => Int): List[Int] = {
+			numbers.foldRight(List[Int]()) { (x: Int, xs: List[Int]) =>
+				fn(x) :: xs
+			}
+		}
+		// ourMap(numbers, timesTwo(_))
+		ourMap(List(1, 2, 3, 4, 5), x => x + 10)
+		// to understand above, have a look at follows:
+		List(1, 3, 5, 7).foldRight(List[Int]()){(m:Int, n: List[Int]) => println("m: " + m + " n: " + n); println(n); m + 100 :: n}
+		// the :: is an infix operator called cons, which basically create/separate a list
+		// to [first element] :: [rest elements as another List]
+		// (m + 100 :: n) basically put (m + 100) in front of the newly created list
+    // List[Int]() creates empty list of Ints to accumulate into (append/add)
+		// which also tells the second part of curry that the result will be
+		// List[Int] type, this can be find within the {} part
+
+		// All of (above) functional combinator work on Maps too. Maps can be
+		// thought of as a list of pairs (key + value pair).
+		//
+	  // scala> val extensions = Map("steve" -> 100, "bob" -> 101, "joe" -> 201)
+		// extensions: scala.collection.immutable.Map[java.lang.String,Int] = Map(steve -> 100, bob -> 101, joe -> 201)
+
+		// scala> extensions.filter((namePhone: (String, Int)) => namePhone._2 < 200)
+		// res14: scala.collection.immutable.Map[java.lang.String,Int] = Map(steve -> 100, bob -> 101)
+
+		// scala> extensions.filter(case (name, extension) => extension < 200)
+		// <console>:1: error: illegal start of simple expression
+		//        extensions.filter(case (name, extension) => extension < 200)
+
 	}
 }
 
