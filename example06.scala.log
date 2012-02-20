@@ -1,0 +1,79 @@
+http://twitter.github.com/scala_school/type-basics.html
+
+Adanvced types:
+
+View bounds ("type classes")
+Higher kinded types & ad-hoc polymorphism
+F-bounded polymorphism / recursive types
+Structural types
+Abstract types members
+Type erasures & manifests
+Case study: Finagle
+
+
+View bounds
+
+Implicit functions in scala allow for on-demand function application when this can help satisfy type inference. eg.:
+> scala> val y: Int = "123"
+> <console>:7: error: type mismatch;
+>  found   : java.lang.String("123")
+>   required: Int
+>          val y: Int = "123"
+>                       ^
+> 
+> scala> implicit def strToInt(x: String) = x.toInt
+> strToInt: (x: String)Int
+> 
+> scala> val y: Int = "123"
+> y: Int = 123
+
+view bounds, like type bounds demand such a function exists for the given type. e.g.:
+> scala> class Container[A <% Int] { def addIt(x: A) = 123 + x }
+> defined class Container
+
+This says that A has to be "viewable" as Int. Let's try it:
+> scala> (new Container[String]).addIt("123")
+> res46: Int = 246
+> 
+> scala> (new Container[Int]).addIt("123")
+> res47: Int = 246
+> 
+> scala> (new Container[Float]).addIt("123")
+> <console>:11: error: No implicit view available from Float => Int.
+>        (new Container[Float]).addIt("123")
+
+Other type bounds
+
+Methods may ask for specific “evidence” for a type, namely:
+A =:= B     A must be equal to B
+A <:< B     A must be a subtype of B
+A <%< B     A must be viewable as B
+
+cala> class Container[A](value: A) { def addIt(implicit evidence: A =:= Int) = 123 + value }
+defined class Container
+
+scala> (new Container[Int](123)).addIt
+res49: Int = 246
+
+scala> (new Container("123")).addIt
+<console>:11: error: Cannot prove that java.lang.String =:= Int.
+       (new Container("123")).addIt
+                               ^
+Similarly, given our previous implicit, we can relax the constraint to viewability:
+scala> class Container[A](value: A) { def addIt(implicit evidence: A <%< Int) = 123 + value }
+warning: there were 1 deprecation warnings; re-run with -deprecation for details
+defined class Container
+
+scala> (new Container("123")).addIt
+res51: Int = 246
+
+scala> (new Container(1235)).addIt
+res52: Int = 1358
+
+scala> (new Container(123.55)).addIt
+<console>:11: error: could not find implicit value for parameter evidence: <%<[Double,Int]
+       (new Container(123.55)).addIt
+                                ^
+
+Generic programming with views:
+
