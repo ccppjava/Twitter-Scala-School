@@ -1,0 +1,15 @@
+please refer to:
+http://twitter.github.com/scala_school/pattern-matching-and-functional-composition.html
+
+however which is for version 2.8.x, in 2.9.0.1, the grammer does not work
+it need more complex grammer to have same effect.
+
+compose:
+scala> val ummThenAhem = (addAhem(_)).compose(addUmm(_:String))
+	ummThenAhem: (String) => java.lang.String = <function1>
+
+andThen:
+scala> val ahemThenUmm = (addAhem(_)).andThen(addUmm (_))
+	ahemThenUmm: (String) => java.lang.String = <function1>
+
+
