@@ -77,3 +77,83 @@ scala> (new Container(123.55)).addIt
 
 Generic programming with views:
 
+In the Scala standard library, views are primarily used to implement generic functions over
+collections. For example, the "min" function (on Seq[]), use this technique:
+
+TODO: cannot get the example working here
+
+> scala> List(1,2,3,4).min
+> res0: Int = 1
+> 
+> scala>  List(1,2,3,4).min(new Ordering[Int] { def compare(a: Int, b: Int) = b compare a })
+> 	res1: Int = 4
+
+
+Context bounds & implicity[]
+
+> cala> def foo[A](implicit x: Ordered[A]) {}
+> foo: [A](implicit x: Ordered[A])Unit
+> 
+> scala> def foo[A: Ordered] {}
+> foo: [A](implicit evidence$1: Ordered[A])Unit
+
+Implicit values may be accessed via implicitly
+
+> scala> implicitly[Ordering[Int]]
+> res1: Ordering[Int] = scala.math.Ordering$Int$@72766b42
+
+Combined, these often result in less code, especially when threading through views.
+
+
+Higher-kinded types & ad-hoc polymorphism
+
+Scala can abstract over "higher kinded" types. This is analoagous to function currying. 
+For example, whereas "unary types" have constructors like this:
+> List[A]
+Meaning we have to satisfy one "level" of type variables in order to produce a concrete types (just like an 
+uncurried function needs to be supplied by only one argument list to be invoked), a higher-kinded type need more:
+
+> scala> trait MyContainer[M[_]] { def put[A](x: A): M[A]; def get[A](m: M[A]): A }
+> defined trait MyContainer
+> 
+> scala> val curryType = new MyContainer[List] { def put[A](x: A) = List[A](x); def get[A](m: List[A]) = m.head }
+> curryType: java.lang.Object with MyContainer[List] = $anon$1@271ff1b8
+> 
+> scala> curryType.put("abc")
+> res6: List[java.lang.String] = List(abc)
+> 
+> scala> curryType.get(List("abc"))
+> res7: java.lang.String = abc
+> 
+> scala> curryType.put(123)
+> res8: List[Int] = List(123)
+
+Note that MyContainer is polymorphic in a parameterezed type ("container type").
+
+If we combine using containers with implicits, we get "ad-hoc" polymorphism: the ability to
+write generic functions over containers.
+
+> scala> trait MyContainer[M[_]] { def put[A](x: A): M[A]; def get[A](m: M[A]): A }
+> defined trait MyContainer
+> 
+> scala> implicit val listContainer = new MyContainer[List] { def put[A](x: A) = List[A](x); def get[A](m: List[A]) = m.head }
+> listContainer: java.lang.Object with MyContainer[List] = $anon$1@b45ad3d
+> 
+> scala> implicit val optionContainer = new MyContainer[Some] { def put[A](x: A) = Some[A](x); def get[A](m: Some[A]) = m.get }
+> optionContainer: java.lang.Object with MyContainer[Some] = $anon$1@7079724
+> 
+> scala> def tupleize[M[_]: MyContainer, A, B](fst: M[A], snd: M[B]) = {
+> 	     | val c = implicitly[MyContainer[M]]
+> 				      | c.put(c.get(fst), c.get(snd))
+> 							     | }
+> tupleize: [M[_], A, B](fst: M[A], snd: M[B])(implicit evidence$1: MyContainer[M])M[(A, B)]
+> 
+> scala> tupleize(Some(1), Some(2))
+> res9: Some[(Int, Int)] = Some((1,2))
+> 
+> scala> tupleize(List(1), List(2))
+> res10: List[(Int, Int)] = List((1,2))
+
+TODO: spend more time to understand above codes
+
+TODO: need more reading before I can understand the content, will come back to this page
