@@ -1,3 +1,6 @@
+source code here is typed in according to:
+http://typesafe.com/resources/getting-started/tutorials/getting-started-with-akka-scala.html
+
 A sample for the Typesafe Stack (http://typesafe.com/stack).
 
 Akka 2.0 sample project using Scala and SBT.
