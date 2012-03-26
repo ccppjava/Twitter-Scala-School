@@ -51,6 +51,7 @@ object Pi extends App {
 					listener ! PiApproximation(pi, duration = (System.currentTimeMillis - start).millis)
 					// Stops this actor and all its supervised children
 					context.stop(self)
+				}
 		}
 	}
 	
