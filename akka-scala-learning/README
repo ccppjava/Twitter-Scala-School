@@ -1,6 +1,17 @@
 source code here is typed in according to:
 http://typesafe.com/resources/getting-started/tutorials/getting-started-with-akka-scala.html
 
+to run in command line:
+
+1. compile
+scalac -cp /home/yuqi/.ivy2/cache/com.typesafe.akka/akka-actor/jars/akka-actor-2.0.jar src/main/scala/home/learning/akka/pi/Pi.scala 
+
+2. run
+java -cp .:/usr/share/java/scala-library.jar:/home/yuqi/.ivy2/cache/com.typesafe.akka/akka-actor/jars/akka-actor-2.0.jar home.learning.akka.pi.Pi
+
+	Pi approximation: 		3.1415926435897883
+		Calculation time: 	7028 milliseconds
+
 A sample for the Typesafe Stack (http://typesafe.com/stack).
 
 Akka 2.0 sample project using Scala and SBT.
